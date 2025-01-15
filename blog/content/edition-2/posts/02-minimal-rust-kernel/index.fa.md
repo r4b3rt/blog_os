@@ -5,7 +5,6 @@ path = "fa/minimal-rust-kernel"
 date = 2018-02-10
 
 [extra]
-chapter = "Bare Bones"
 # Please update this when updating the translation
 translation_based_on_commit = "7212ffaa8383122b1eb07fe1854814f99d2e1af4"
 # GitHub usernames of the people that translated this post
@@ -23,6 +22,7 @@ rtl = true
 
 [گیت‌هاب]: https://github.com/phil-opp/blog_os
 [در زیر]: #comments
+<!-- fix for zola anchor checker (target is in template): <a id="comments"> -->
 [post branch]: https://github.com/phil-opp/blog_os/tree/post-02
 
 <!-- toc -->
@@ -95,7 +95,7 @@ rtl = true
 
 همانطور که ممکن است به یاد داشته باشید، باینری مستقل را از طریق `cargo` ایجاد کردیم، اما با توجه به سیستم عامل، به نام‌های ورودی و پرچم‌های کامپایل مختلف نیاز داشتیم. به این دلیل که `cargo` به طور پیش فرض برای سیستم میزبان بیلد می‌کند، بطور مثال سیستمی که از آن برای نوشتن هسته استفاده می‌کنید. این چیزی نیست که ما برای هسته خود بخواهیم‌، زیرا منطقی نیست که هسته سیستم عامل‌مان را روی یک سیستم عامل دیگر اجرا کنیم. در عوض، ما می‌خواهیم هسته را برای یک _سیستم هدف_ کاملاً مشخص کامپایل کنیم.
 
-### نصب Rust Nightly
+### نصب Rust Nightly {#installing-rust-nightly}
 
 راست دارای سه کانال انتشار است: _stable_, _beta_, and _nightly_ (ترجمه از چپ به راست: پایدار، بتا و شبانه). کتاب Rust تفاوت بین این کانال‌ها را به خوبی توضیح می‌دهد، بنابراین یک دقیقه وقت بگذارید و [آن را بررسی کنید](https://doc.rust-lang.org/book/appendix-07-nightly-rust.html#choo-choo-release-channels-and-riding-the-trains). برای ساخت یک سیستم عامل به برخی از ویژگی‌های آزمایشی نیاز داریم که فقط در کانال شبانه موجود است‌، بنابراین باید نسخه شبانه Rust را نصب کنیم.
 
@@ -105,7 +105,7 @@ rtl = true
 
 کامپایلر شبانه به ما امکان می‌دهد با استفاده از به اصطلاح _feature flags_ در بالای فایل، از ویژگی‌های مختلف آزمایشی استفاده کنیم. به عنوان مثال، می‌توانیم [`asm!` macro] آزمایشی را برای اجرای دستورات اسمبلیِ این‌لاین (تلفظ: inline) با اضافه کردن `[feature(asm)]!#` به بالای فایل `main.rs` فعال کنیم. توجه داشته باشید که این ویژگی‌های آزمایشی، کاملاً ناپایدار هستند‌، به این معنی که نسخه‌های آتی Rust ممکن است بدون هشدار قبلی آن‌ها را تغییر داده یا حذف کند. به همین دلیل ما فقط در صورت لزوم از آنها استفاده خواهیم کرد.
 
-[`asm!` macro]: https://doc.rust-lang.org/unstable-book/library-features/asm.html
+[`asm!` macro]: https://doc.rust-lang.org/stable/reference/inline-assembly.html
 
 ### مشخصات هدف
 
@@ -121,7 +121,7 @@ rtl = true
 ```json
 {
     "llvm-target": "x86_64-unknown-linux-gnu",
-    "data-layout": "e-m:e-i64:64-f80:128-n8:16:32:64-S128",
+    "data-layout": "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128",
     "arch": "x86_64",
     "target-endian": "little",
     "target-pointer-width": "64",
@@ -144,7 +144,7 @@ rtl = true
 ```json
 {
     "llvm-target": "x86_64-unknown-none",
-    "data-layout": "e-m:e-i64:64-f80:128-n8:16:32:64-S128",
+    "data-layout": "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128",
     "arch": "x86_64",
     "target-endian": "little",
     "target-pointer-width": "64",
@@ -203,7 +203,7 @@ For more information, see our post on [disabling SIMD](@/edition-2/posts/02-mini
 ```json
 {
     "llvm-target": "x86_64-unknown-none",
-    "data-layout": "e-m:e-i64:64-f80:128-n8:16:32:64-S128",
+    "data-layout": "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128",
     "arch": "x86_64",
     "target-endian": "little",
     "target-pointer-width": "64",
@@ -322,7 +322,7 @@ build-std-features = ["compiler-builtins-mem"]
  در پشت صحنه، این پرچم [ویژگی `mem`] از کریت `compiler_builtins` را فعال می‌کند. اثرش این است که صفت `[no_mangle]#` بر روی [پیاده‌سازی `memcpy` و بقیه موارد] از کریت اعمال می‌شود، که آن‌ها در دسترس لینکر قرار می‌دهد. شایان ذکر است که این توابع در حال حاضر [بهینه نشده‌اند]، بنابراین ممکن است عملکرد آ‌ن‌ها در بهترین حالت نباشد، اما حداقل صحیح هستند. برای `x86_64` ، یک  pull request باز برای [بهینه سازی این توابع با استفاده از دستورالعمل‌های خاص اسمبلی][memcpy rep movsb] وجود دارد.
 
 [ویژگی `mem`]: https://github.com/rust-lang/compiler-builtins/blob/eff506cd49b637f1ab5931625a33cef7e91fbbf6/Cargo.toml#L51-L52
-[پیاده‌سازی `memcpy` و بقیه موارد]: (https://github.com/rust-lang/compiler-builtins/blob/eff506cd49b637f1ab5931625a33cef7e91fbbf6/src/mem.rs#L12-L69)
+[پیاده‌سازی `memcpy` و بقیه موارد]: https://github.com/rust-lang/compiler-builtins/blob/eff506cd49b637f1ab5931625a33cef7e91fbbf6/src/mem.rs#L12-L69
 [بهینه نشده‌اند]: https://github.com/rust-lang/compiler-builtins/issues/339
 [memcpy rep movsb]: https://github.com/rust-lang/compiler-builtins/pull/365
 
@@ -413,7 +413,7 @@ pub extern "C" fn _start() -> ! {
 # in Cargo.toml
 
 [dependencies]
-bootloader = "0.9.8"
+bootloader = "0.9"
 ```
 
 افزودن بوت‌لودر به عنوان وابستگی برای ایجاد یک دیسک ایمیج قابل بوت کافی نیست. مشکل این است که ما باید هسته خود را با بوت لودر پیوند دهیم، اما کارگو از [اسکریپت های بعد از بیلد] پشتیبانی نمی‌کند.

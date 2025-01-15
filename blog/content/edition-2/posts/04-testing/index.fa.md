@@ -5,7 +5,6 @@ path = "fa/testing"
 date = 2019-04-27
 
 [extra]
-chapter = "Bare Bones"
 # Please update this when updating the translation
 translation_based_on_commit = "d007af4811469b974f7abb988dd9c9d1373b55f0"
 # GitHub usernames of the people that translated this post
@@ -21,6 +20,7 @@ rtl = true
 
 [گیت‌هاب]: https://github.com/phil-opp/blog_os
 [در زیر]: #comments
+<!-- fix for zola anchor checker (target is in template): <a id="comments"> -->
 [post branch]: https://github.com/phil-opp/blog_os/tree/post-04
 
 <!-- toc -->
@@ -76,7 +76,7 @@ error[E0463]: can't find crate for `test`
 #![test_runner(crate::test_runner)]
 
 #[cfg(test)]
-fn test_runner(tests: &[&dyn Fn()]) {
+pub fn test_runner(tests: &[&dyn Fn()]) {
     println!("Running {} tests", tests.len());
     for test in tests {
         test();

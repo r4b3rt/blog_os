@@ -5,11 +5,12 @@ path = "ja/async-await"
 date = 2020-03-27
 
 [extra]
-chapter = "Multitasking"
 # Please update this when updating the translation
 translation_based_on_commit = "bf4f88107966c7ab1327c3cdc0ebfbd76bad5c5f"
-# GitHub usernames of the people that translated this post
-translators = ["kahirokunn", "garasubo", "sozysozbot", "woodyZootopia"]
+# GitHub usernames of the authors of this translation
+translators = ["kahirokunn", "garasubo", "sozysozbot", "swnakamura"]
+# GitHub usernames of the people that contributed to this translation
+translation_contributors = ["asami-kawasaki", "Foo-x"]
 +++
 
 この記事では、Rustの**協調的マルチタスク**と**async/await**機能について説明します。Rustのasync/await機能については、`Future` trait の設計、ステートマシンの変換、 **pinning** などを含めて詳しく説明します。そして、非同期キーボードタスクと基本的なexecutorを作成することで、カーネルにasync/awaitの基本的なサポートを追加します。
@@ -20,6 +21,7 @@ translators = ["kahirokunn", "garasubo", "sozysozbot", "woodyZootopia"]
 
 [GitHub]: https://github.com/phil-opp/blog_os
 [at the bottom]: #comments
+<!-- fix for zola anchor checker (target is in template): <a id="comments"> --> 
 [post branch]: https://github.com/phil-opp/blog_os/tree/post-12
 
 <!-- toc -->
@@ -55,7 +57,7 @@ translators = ["kahirokunn", "garasubo", "sozysozbot", "woodyZootopia"]
 [コールスタック]: https://ja.wikipedia.org/wiki/%E3%82%B3%E3%83%BC%E3%83%AB%E3%82%B9%E3%82%BF%E3%83%83%E3%82%AF
 [コンテキスト・スイッチ (context switch)]: https://ja.wikipedia.org/wiki/%E3%82%B3%E3%83%B3%E3%83%86%E3%82%AD%E3%82%B9%E3%83%88%E3%82%B9%E3%82%A4%E3%83%83%E3%83%81
 
-コールスタックは非常に大きくなる可能性があるため、OSは通常、各タスクのスイッチでコールスタックの内容をバックアップする代わりに、各タスクに個別のコールスタックを設定します。このような独立したスタックを持つタスクは、[_thread of execution_](略して**スレッド**)と呼ばれます。タスクごとに独立したスタックを使用することで、コンテキスト・スイッチの際に保存する必要があるのはレジスタの内容だけになります(プログラム・カウンタとスタック・ポインタを含む)。この方法を取ることで、コンテキスト・スイッチの性能上のオーバーヘッドが最小限になります。これは、コンテキスト・スイッチが1秒間に100回も行われることがあるため、非常に重要なことです。
+コールスタックは非常に大きくなる可能性があるため、OSは通常、各タスクのスイッチでコールスタックの内容をバックアップする代わりに、各タスクに個別のコールスタックを設定します。このような独立したスタックを持つタスクは、[略して**スレッド**][_thread of execution_]と呼ばれます。タスクごとに独立したスタックを使用することで、コンテキスト・スイッチの際に保存する必要があるのはレジスタの内容だけになります(プログラム・カウンタとスタック・ポインタを含む)。この方法を取ることで、コンテキスト・スイッチの性能上のオーバーヘッドが最小限になります。これは、コンテキスト・スイッチが1秒間に100回も行われることがあるため、非常に重要なことです。
 
 [_thread of execution_]: https://ja.wikipedia.org/wiki/%E3%82%B9%E3%83%AC%E3%83%83%E3%83%89_(%E3%82%B3%E3%83%B3%E3%83%94%E3%83%A5%E3%83%BC%E3%82%BF)
 
@@ -232,7 +234,7 @@ Futureコンビネータの大きな利点は、操作を非同期に保つこ�
 
 [_Zero-cost futures in Rust_]: https://aturon.github.io/blog/2016/08/11/futures/
 
-##### 欠点
+##### 欠点 {#drawbacks}
 
 Futureコンビネータを使うと、非常に効率的なコードを書くことができますが、型システムやクロージャベースのインターフェイスのため、状況によっては使いにくいことがあります。例えば、次のようなコードを考えてみましょう:
 
@@ -424,7 +426,7 @@ ExampleStateMachine::WaitingOnFooTxt(state) => {
                 };
                 *self = ExampleStateMachine::WaitingOnBarTxt(state);
             } else {
-                *self = ExampleStateMachine::End(EndState));
+                *self = ExampleStateMachine::End(EndState);
                 return Poll::Ready(content);
             }
         }
@@ -445,7 +447,7 @@ ExampleStateMachine::WaitingOnBarTxt(state) => {
     match state.bar_txt_future.poll(cx) {
         Poll::Pending => return Poll::Pending,
         Poll::Ready(bar_txt) => {
-            *self = ExampleStateMachine::End(EndState));
+            *self = ExampleStateMachine::End(EndState);
             // from body of `example`
             return Poll::Ready(state.content + &bar_txt);
         }
@@ -466,9 +468,9 @@ ExampleStateMachine::End(_) => {
 
 Futureは `Poll::Ready` を返した後、再びポーリングされるべきではありません。したがって、すでに `End` の状態にあるときに `poll` が呼ばれるとパニックするようにしましょう。
 
-コンパイラが生成するステートマシンとその `Future` traitの実装はこのようになっている**かもしれません**。実際には、コンパイラは異なる方法でコードを生成しています。 (一応、現在は[_generators_]をベースにした実装になっていますが、これはあくまでも実装の詳細です。)
+コンパイラが生成するステートマシンとその `Future` traitの実装はこのようになっている**かもしれません**。実際には、コンパイラは異なる方法でコードを生成しています。 (一応、現在は[_coroutines_]をベースにした実装になっていますが、これはあくまでも実装の詳細です。)
 
-[_generators_]: https://doc.rust-lang.org/nightly/unstable-book/language-features/generators.html
+[_coroutines_]: https://doc.rust-lang.org/stable/unstable-book/language-features/coroutines.html
 
 パズルの最後のピースは、生成された `example` 関数自体のコードです。関数のヘッダは次のように定義されていたことを思い出してください:
 
@@ -603,7 +605,7 @@ println!("internal reference: {:p}", stack_value.self_ptr);
 [`Pin`]: https://doc.rust-lang.org/stable/core/pin/struct.Pin.html
 [`Unpin`]: https://doc.rust-lang.org/nightly/std/marker/trait.Unpin.html
 [pin-get-mut]: https://doc.rust-lang.org/nightly/core/pin/struct.Pin.html#method.get_mut
-[pin-deref-mut]: https://doc.rust-lang.org/nightly/core/pin/struct.Pin.html#impl-DerefMut
+[pin-deref-mut]: https://doc.rust-lang.org/nightly/core/pin/struct.Pin.html#method.deref_mut
 [_auto trait_]: https://doc.rust-lang.org/reference/special-types-and-traits.html#auto-traits
 
 例として、上記の `SelfReferential` 型を更新して、`Unpin` を使用しないようにしてみましょう:
@@ -700,7 +702,7 @@ unsafe {
 fn poll(self: Pin<&mut Self>, cx: &mut Context) -> Poll<Self::Output>
 ```
 
-このメソッドが通常の`&mut self`ではなく`self: Pin<&mut Self>`を取る理由は、[上][self-ref-async-await]で見たように、async/awaitから生成されるfutureのインスタンスはしばしば自己参照しているためです。`Self` を `Pin` にラップして、async/await から生成された自己参照のfutureに対して、コンパイラに `Unpin` を選択させることで、`poll` 呼び出しの間にfutureがメモリ内で移動しないことが保証されます。これにより、すべての内部参照が有効であることが保証されます。
+このメソッドが通常の`&mut self`ではなく`self: Pin<&mut Self>`を取る理由は、[上][self-ref-async-await]で見たように、async/awaitから生成されるfutureのインスタンスはしばしば自己参照しているためです。`Self` を `Pin` にラップして、async/await から生成された自己参照のfutureに対して、コンパイラに `Unpin` をオプトアウトさせることで、`poll` 呼び出しの間にfutureがメモリ内で移動しないことが保証されます。これにより、すべての内部参照が有効であることが保証されます。
 
 [self-ref-async-await]: @/edition-2/posts/12-async-await/index.md#self-referential-structs
 
@@ -1360,8 +1362,8 @@ use crate::print;
 
 pub async fn print_keypresses() {
     let mut scancodes = ScancodeStream::new();
-    let mut keyboard = Keyboard::new(layouts::Us104Key, ScancodeSet1,
-        HandleControl::Ignore);
+    let mut keyboard = Keyboard::new(ScancodeSet1::new(),
+        layouts::Us104Key, HandleControl::Ignore);
 
     while let Some(scancode) = scancodes.next().await {
         if let Ok(Some(key_event)) = keyboard.add_byte(scancode) {

@@ -5,11 +5,10 @@ path = "ja/testing"
 date = 2019-04-27
 
 [extra]
-chapter = "Bare Bones"
 # Please update this when updating the translation
 translation_based_on_commit = "dce5c9825bd4e7ea6c9530e999c9d58f80c585cc"
 # GitHub usernames of the people that translated this post
-translators = ["woodyZootopia", "JohnTitor"]
+translators = ["swnakamura", "JohnTitor"]
 +++
 
 この記事では、`no_std`な実行環境における<ruby>単体テスト<rp> (</rp><rt>unit test</rt><rp>) </rp></ruby>と<ruby>結合テスト<rp> (</rp><rt>integration test</rt><rp>) </rp></ruby>について学びます。Rustではカスタムテストフレームワークがサポートされているので、これを使ってカーネルの中でテスト関数を実行します。QEMUの外へとテストの結果を通知するため、QEMUと`bootimage`の様々な機能を使います。
@@ -20,6 +19,7 @@ translators = ["woodyZootopia", "JohnTitor"]
 
 [GitHub]: https://github.com/phil-opp/blog_os
 [at the bottom]: #comments
+<!-- fix for zola anchor checker (target is in template): <a id="comments"> -->
 [post branch]: https://github.com/phil-opp/blog_os/tree/post-04
 
 <!-- toc -->
@@ -80,7 +80,7 @@ error[E0463]: can't find crate for `test`
 #![test_runner(crate::test_runner)]
 
 #[cfg(test)]
-fn test_runner(tests: &[&dyn Fn()]) {
+pub fn test_runner(tests: &[&dyn Fn()]) {
     println!("Running {} tests", tests.len());
     for test in tests {
         test();
@@ -889,7 +889,7 @@ fn test_println() {
 
 標準ライブラリのテストフレームワークは、[`#[should_panic]`属性][should_panic]をサポートしています。これを使うと、失敗しなければならないテストを作ることができます。これは、例えば、関数が無効な引数を渡されたときに失敗することを確かめる場合などに便利です。残念なことに、この機能は標準ライブラリのサポートを必要とするため、`#[no_std]`クレートではこの属性はサポートされていません。
 
-[should_panic]: https://doc.rust-jp.rs/rust-by-example-ja/testing/unit_testing.html#testing-panics
+[should_panic]: https://doc.rust-jp.rs/rust-by-example-ja/testing/unit_testing.html#パニックをテストする
 
 `#[should_panic]`属性は使えませんが、パニックハンドラから成功のエラーコードで終了するような結合テストを作れば、似たような動きをさせることはできます。そのようなテストを`should_panic`という名前で作ってみましょう：
 

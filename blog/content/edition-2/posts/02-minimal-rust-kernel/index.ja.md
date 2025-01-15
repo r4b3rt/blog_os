@@ -5,11 +5,10 @@ path = "ja/minimal-rust-kernel"
 date = 2018-02-10
 
 [extra]
-chapter = "Bare Bones"
 # Please update this when updating the translation
 translation_based_on_commit = "7212ffaa8383122b1eb07fe1854814f99d2e1af4"
 # GitHub usernames of the people that translated this post
-translators = ["woodyZootopia", "JohnTitor"]
+translators = ["swnakamura", "JohnTitor"]
 +++
 
 この記事では、Rustで最小限の64bitカーネルを作ります。前の記事で作った[フリースタンディングなRustバイナリ][freestanding Rust binary]を下敷きにして、何かを画面に出力する、ブータブルディスクイメージを作ります。
@@ -22,11 +21,12 @@ translators = ["woodyZootopia", "JohnTitor"]
 
 [GitHub]: https://github.com/phil-opp/blog_os
 [at the bottom]: #comments
+<!-- fix for zola anchor checker (target is in template): <a id="comments"> -->
 [post branch]: https://github.com/phil-opp/blog_os/tree/post-02
 
 <!-- toc -->
 
-## <ruby>起動<rp> (</rp><rt>Boot</rt><rp>) </rp></ruby>のプロセス
+## <ruby>起動<rp> (</rp><rt>Boot</rt><rp>) </rp></ruby>のプロセス {#the-boot-process}
 コンピュータを起動すると、マザーボードの [ROM] に保存されたファームウェアのコードを実行し始めます。このコードは、[<ruby>起動時の自己テスト<rp> (</rp><rt>power-on self test</rt><rp>) </rp></ruby>][power-on self-test]を実行し、使用可能なRAMを検出し、CPUとハードウェアを<ruby>事前初期化<rp> (</rp><rt>pre-initialize</rt><rp>) </rp></ruby>します。その後、<ruby>ブータブル<rp> (</rp><rt>bootable</rt><rp>) </rp></ruby>ディスクを探し、オペレーティングシステムのカーネルを<ruby>起動<rp> (</rp><rt>boot</rt><rp>) </rp></ruby>します。
 
 [ROM]: https://ja.wikipedia.org/wiki/Read_only_memory
@@ -91,7 +91,7 @@ x86には2つのファームウェアの標準規格があります："Basic Inp
 
 覚えていますか、この独立したバイナリは`cargo`を使ってビルドしましたが、オペレーティングシステムに依って異なるエントリポイント名とコンパイルフラグが必要なのでした。これは`cargo`は標準では **ホストシステム**（あなたの使っているシステム）向けにビルドするためです。例えばWindows上で走るカーネルというのはあまり意味がなく、私達の望む動作ではありません。代わりに、明確に定義された **ターゲットシステム** 向けにコンパイルできると理想的です。
 
-### RustのNightly版をインストールする
+### RustのNightly版をインストールする {#installing-rust-nightly}
 Rustには**stable**、**beta**、**nightly**の3つのリリースチャンネルがあります。Rust Bookはこれらの3つのチャンネルの違いをとても良く説明しているので、一度[確認してみてください](https://doc.rust-jp.rs/book-ja/appendix-07-nightly-rust.html)。オペレーティングシステムをビルドするには、nightlyチャンネルでしか利用できないいくつかの実験的機能を使う必要があるので、Rustのnightly版をインストールすることになります。
 
 Rustの実行環境を管理するのには、[rustup]を強くおすすめします。nightly、beta、stable版のコンパイラをそれぞれインストールすることができますし、アップデートするのも簡単です。現在のディレクトリにnightlyコンパイラを使うようにするには、`rustup override set nightly`と実行してください。もしくは、`rust-toolchain`というファイルに`nightly`と記入してプロジェクトのルートディレクトリに置くことでも指定できます。Nightly版を使っていることは、`rustc --version`と実行することで確かめられます。表示されるバージョン名の末尾に`-nightly`とあるはずです。
@@ -100,7 +100,7 @@ Rustの実行環境を管理するのには、[rustup]を強くおすすめし�
 
 nightlyコンパイラでは、いわゆる**feature flag**をファイルの先頭につけることで、いろいろな実験的機能を使うことを選択できます。例えば、`#![feature(asm)]`を`main.rs`の先頭につけることで、インラインアセンブリのための実験的な[`asm!`マクロ][`asm!` macro]を有効化することができます。ただし、これらの実験的機能は全くもって<ruby>不安定<rp> (</rp><rt>unstable</rt><rp>) </rp></ruby>であり、将来のRustバージョンにおいては事前の警告なく変更されたり取り除かれたりする可能性があることに注意してください。このため、絶対に必要なときにのみこれらを使うことにします。
 
-[`asm!` macro]: https://doc.rust-lang.org/unstable-book/library-features/asm.html
+[`asm!` macro]: https://doc.rust-lang.org/stable/reference/inline-assembly.html
 
 ### ターゲットの仕様
 Cargoは`--target`パラメータを使ってさまざまなターゲットをサポートします。ターゲットはいわゆる[target <ruby>triple<rp> (</rp><rt>3つ組</rt><rp>) </rp></ruby>][target triple]によって表されます。これはCPUアーキテクチャ、製造元、オペレーティングシステム、そして[ABI]を表します。例えば、`x86_64-unknown-linux-gnu`というtarget tripleは、`x86_64`のCPU、製造元不明、GNU ABIのLinuxオペレーティングシステム向けのシステムを表します。Rustは[多くのtarget triple][platform-support]をサポートしており、その中にはAndroidのための`arm-linux-androideabi`や[WebAssemblyのための`wasm32-unknown-unknown`](https://www.hellorust.com/setup/wasm-target/)などがあります。
@@ -115,7 +115,7 @@ Cargoは`--target`パラメータを使ってさまざまなターゲットを�
 ```json
 {
     "llvm-target": "x86_64-unknown-linux-gnu",
-    "data-layout": "e-m:e-i64:64-f80:128-n8:16:32:64-S128",
+    "data-layout": "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128",
     "arch": "x86_64",
     "target-endian": "little",
     "target-pointer-width": "64",
@@ -138,7 +138,7 @@ Cargoは`--target`パラメータを使ってさまざまなターゲットを�
 ```json
 {
     "llvm-target": "x86_64-unknown-none",
-    "data-layout": "e-m:e-i64:64-f80:128-n8:16:32:64-S128",
+    "data-layout": "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128",
     "arch": "x86_64",
     "target-endian": "little",
     "target-pointer-width": "64",
@@ -197,7 +197,7 @@ SIMDを無効化することによる問題に、`x86_64`における浮動小�
 ```json
 {
     "llvm-target": "x86_64-unknown-none",
-    "data-layout": "e-m:e-i64:64-f80:128-n8:16:32:64-S128",
+    "data-layout": "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128",
     "arch": "x86_64",
     "target-endian": "little",
     "target-pointer-width": "64",
@@ -316,7 +316,7 @@ build-std-features = ["compiler-builtins-mem"]
 このとき、裏で`compiler_builtins`クレートの[`mem`機能][`mem` feature]が有効化されています。これにより、このクレートの[`memcpy`などの実装][`memcpy` etc. implementations]に`#[no_mangle]`アトリビュートが適用され、リンカがこれらを利用できるようになっています。
 
 [`mem` feature]: https://github.com/rust-lang/compiler-builtins/blob/eff506cd49b637f1ab5931625a33cef7e91fbbf6/Cargo.toml#L51-L52
-[`memcpy` etc. implementations]: (https://github.com/rust-lang/compiler-builtins/blob/eff506cd49b637f1ab5931625a33cef7e91fbbf6/src/mem.rs#L12-L69)
+[`memcpy` etc. implementations]: https://github.com/rust-lang/compiler-builtins/blob/eff506cd49b637f1ab5931625a33cef7e91fbbf6/src/mem.rs#L12-L69
 
 この変更をもって、私達のカーネルはコンパイラに必要とされているすべての関数の有効な実装を手に入れたので、コードがもっと複雑になっても変わらずコンパイルできるでしょう。
 
@@ -410,7 +410,7 @@ pub extern "C" fn _start() -> ! {
 # in Cargo.toml
 
 [dependencies]
-bootloader = "0.9.8"
+bootloader = "0.9"
 ```
 
 bootloaderを依存として加えることだけでブータブルディスクイメージが実際に作れるわけではなく、私達のカーネルをコンパイル後にブートローダーにリンクする必要があります。問題は、cargoが[<ruby>ビルド後<rp> (</rp><rt>post-build</rt><rp>) </rp></ruby>にスクリプトを走らせる機能][post-build scripts]を持っていないことです。

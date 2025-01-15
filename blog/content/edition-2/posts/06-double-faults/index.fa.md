@@ -5,7 +5,6 @@ path = "fa/double-fault-exceptions"
 date  = 2018-06-18
 
 [extra]
-chapter = "Interrupts"
 # Please update this when updating the translation
 translation_based_on_commit = "3ac829171218156c07ce9a27186fee58e3a5521e"
 # GitHub usernames of the people that translated this post
@@ -21,6 +20,7 @@ rtl = true
 
 [گیت‌هاب]: https://github.com/phil-opp/blog_os
 [در زیر]: #comments
+<!-- fix for zola anchor checker (target is in template): <a id="comments"> -->
 [post branch]: https://github.com/phil-opp/blog_os/tree/post-06
 
 <!-- toc -->
@@ -48,7 +48,7 @@ pub extern "C" fn _start() -> ! {
 
     // trigger a page fault
     unsafe {
-        *(0xdeadbeef as *mut u64) = 42;
+        *(0xdeadbeef as *mut u8) = 42;
     };
 
     // as before
@@ -137,7 +137,7 @@ extern "x86-interrupt" fn double_fault_handler(
 [Divide-by-zero],<br>[Invalid TSS],<br>[Segment Not Present],<br>[Stack-Segment Fault],<br>[General Protection Fault] | [Invalid TSS],<br>[Segment Not Present],<br>[Stack-Segment Fault],<br>[General Protection Fault]
 [Page Fault] | [Page Fault],<br>[Invalid TSS],<br>[Segment Not Present],<br>[Stack-Segment Fault],<br>[General Protection Fault]
 
-[Divide-by-zero]: https://wiki.osdev.org/Exceptions#Divide-by-zero_Error
+[Divide-by-zero]: https://wiki.osdev.org/Exceptions#Division_Error
 [Invalid TSS]: https://wiki.osdev.org/Exceptions#Invalid_TSS
 [Segment Not Present]: https://wiki.osdev.org/Exceptions#Segment_Not_Present
 [Stack-Segment Fault]: https://wiki.osdev.org/Exceptions#Stack-Segment_Fault
@@ -266,7 +266,7 @@ lazy_static! {
             const STACK_SIZE: usize = 4096 * 5;
             static mut STACK: [u8; STACK_SIZE] = [0; STACK_SIZE];
 
-            let stack_start = VirtAddr::from_ptr(unsafe { &STACK });
+            let stack_start = VirtAddr::from_ptr(&raw const STACK);
             let stack_end = stack_start + STACK_SIZE;
             stack_end
         };
@@ -277,7 +277,9 @@ lazy_static! {
 
 ما از `lazy_static` استفاده می‌کنیم زیرا ارزیابی کننده ثابت راست هنوز آن‌قدر توانمند نیست که بتواند این مقداردهی اولیه را در زمان کامپایل انجام دهد. ما تعریف می‌کنیم که ورودی صفرم IST پشته خطای دوگانه است (هر اندیس دیگری از IST نیز قابل استفاده است). سپس آدرس بالای یک پشته خطای دوگانه را در ورودی صفرم می‌نویسیم. ما آدرس بالایی را می‌نویسیم زیرا پشته‌های x86 به سمت پایین رشد می‌کنند، یعنی از آدرس‌های بالا به آدرس‌های پایین می‌آیند.
 
-ما هنوز مدیریت حافظه را پیاده سازی نکرده‌ایم، بنابراین روش مناسبی برای اختصاص پشته جدید نداریم. در عوض، فعلاً از یک آرایه `static mut` به عنوان حافظه پشته استفاده میکنیم. `unsafe` لازم است زیرا هنگام دسترسی به استاتیک‌های تغییرپذیر (ترجمه: mutable)، کامپایلر نمی‌تواند عدم وجود رقابت بین داده ها را تضمین کند. مهم است که یک `static mut` باشد و نه یک استاتیک‌ تغییرناپذیر (ترجمه: immutable)، زیرا در غیر این صورت bootloader آن را به یک صفحه فقط خواندنی نگاشت می‌کند. ما در پست بعدی این را با یک تخصیص پشته مناسب جایگزین خواهیم کرد، سپس `unsafe` دیگر در این‌جا مورد نیاز نخواهد بود.
+ما هنوز مدیریت حافظه را پیاده سازی نکرده‌ایم، بنابراین روش مناسبی برای اختصاص پشته جدید نداریم.
+در عوض، فعلاً از یک آرایه `static mut` به عنوان حافظه پشته استفاده میکنیم.
+مهم است که یک `static mut` باشد و نه یک استاتیک‌ تغییرناپذیر (ترجمه: immutable)، زیرا در غیر این صورت bootloader آن را به یک صفحه فقط خواندنی نگاشت می‌کند.
 
 توجه داشته باشید که این پشته خطای دوگانه فاقد صفحه محافظ در برابر سرریز پشته است. یعنی ما نباید هیچ کاری که اضافه شدن ایتمی در پشته شود را انجام دهیم زیرا سرریز پشته ممکن است حافظه زیر پشته را خراب کند.
 

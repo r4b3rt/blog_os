@@ -1,44 +1,43 @@
-title = "Writing an OS in Rust"
 base_url = "https://os.phil-opp.com"
+title = "Writing an OS in Rust"
 description = "This blog series creates a small operating system in the Rust programming language. Each post is a small tutorial and includes all needed code."
 
+generate_feeds = true
+feed_filenames = ["rss.xml"]
+compile_sass = true
+minify_html = false
+
+ignored_content = ["*/README.md", "*/LICENSE-CC-BY-NC"]
+
+[markdown]
 highlight_code = true
 highlight_theme = "visual-studio-dark"
-generate_feed = true
-feed_filename = "rss.xml"
-compile_sass = true
-
-languages = [
-    { code = "zh-CN" }, # Chinese (simplified)
-    { code = "zh-TW" }, # Chinese (traditional)
-    { code = "ja" }, # Japanese
-    { code = "fa" }, # Persian
-    { code = "ru" }, # Russian
-    { code = "fr" }, # French
-]
-
-ignored_content = ["*/README.md"]
+smart_punctuation = true
 
 [link_checker]
 skip_prefixes = [
-    "https://crates.io/crates", # see https://github.com/rust-lang/crates.io/issues/788
-    "https://www.amd.com/system/files/TechDocs/", # seems to have problems with PDFs
+    "https://crates.io/crates",                                          # see https://github.com/rust-lang/crates.io/issues/788
+    "https://www.amd.com/system/files/TechDocs/",                        # seems to have problems with PDFs
     "https://developer.apple.com/library/archive/qa/qa1118/_index.html", # results in a 401 (I don't know why)
-    "https://github.com", # rate limiting often leads to "Error 429 Too Many Requests"
-    "https://www.linkedin.com/", # seems to send invalid HTTP status codes
+    "https://github.com",                                                # rate limiting often leads to "Error 429 Too Many Requests"
+    "https://www.linkedin.com/",                                         # seems to send invalid HTTP status codes
 ]
 skip_anchor_prefixes = [
-     "https://github.com/", # see https://github.com/getzola/zola/issues/805
-     "https://docs.rs/x86_64/0.1.2/src/", # source code highlight
-     "https://doc.rust-jp.rs/book-ja/", # seems like Zola has problems with Japanese anchor names
+    "https://github.com/",                            # see https://github.com/getzola/zola/issues/805
+    "https://docs.rs/x86_64/0.1.2/src/",              # source code highlight
+    "https://doc.rust-jp.rs/book-ja/",                # seems like Zola has problems with Japanese anchor names
+    "https://doc.rust-jp.rs/edition-guide/rust-2018", # seems like Zola has problems with Japanese anchor names
+    "https://doc.rust-jp.rs/rust-nomicon-ja/",        # seems like Zola has problems with Japanese anchor names
 ]
 
 [extra]
 subtitle = "Philipp Oppermann's blog"
 author = { name = "Philipp Oppermann" }
+default_language = "en"
+languages = ["en", "zh-CN", "zh-TW", "fr", "ja", "fa", "ru", "ko", "ar"]
 
-[translations.en]
-lang_name = "English"
+[translations]
+lang_name = "English (original)"
 toc = "Table of Contents"
 all_posts = "« All Posts"
 comments = "Comments"
@@ -48,9 +47,21 @@ not_translated = "(This post is not translated yet.)"
 translated_content = "Translated Content:"
 translated_content_notice = "This is a community translation of the <strong><a href=\"_original.permalink_\">_original.title_</a></strong> post. It might be incomplete, outdated or contain errors. Please report any issues!"
 translated_by = "Translation by"
+translation_contributors = "With contributions from"
 word_separator = "and"
+support_me = """
+<h2>Support Me</h2>
+<p>Creating and maintaining this blog and the associated libraries is a lot of work, but I really enjoy doing it. By supporting me, you allow me to invest more time in new content, new features, and continuous maintenance. The best way to support me is to <a href="https://github.com/sponsors/phil-opp"><em>sponsor me on GitHub</em></a>. Thank you!</p>
+"""
+comment_note = """
+Do you have a problem, want to share feedback, or discuss further ideas? Feel free to leave a comment here! Please stick to English and follow Rust's <a href="https://www.rust-lang.org/policies/code-of-conduct">code of conduct</a>. This comment thread directly maps to a <a href="_discussion_url_"><em>discussion on GitHub</em></a>, so you can also comment there if you prefer.
+"""
 
-[translations.zh-CN]
+# Chinese (simplified)
+[languages.zh-CN]
+title = "Writing an OS in Rust"
+description = "This blog series creates a small operating system in the Rust programming language. Each post is a small tutorial and includes all needed code."
+[languages.zh-CN.translations]
 lang_name = "Chinese (simplified)"
 toc = "目录"
 all_posts = "« 所有文章"
@@ -61,9 +72,21 @@ not_translated = "（该文章还没有被翻译。）"
 translated_content = "翻译内容："
 translated_content_notice = "这是对原文章 <strong><a href=\"_original.permalink_\">_original.title_</a></strong> 的社区中文翻译。它可能不完整，过时或者包含错误。可以在 <a href=\"https://github.com/phil-opp/blog_os/issues/961\">这个 Issue</a> 上评论和提问！"
 translated_by = "翻译者："
+translation_contributors = "With contributions from"
 word_separator = "和"
+support_me = """
+<h2>支持我</h2>
+<p>创建和维护这个博客以及相关的库带来了十分庞大的工作量，即便我十分热爱它们，仍然需要你们的支持。通过赞助我，可以让我有能投入更多时间与精力在创造新内容，开发新功能上。赞助我最好的办法是通过<a href="https://github.com/sponsors/phil-opp"><em>sponsor me on GitHub</em></a>. 十分感谢各位！</p>
+"""
+comment_note = """
+你有问题需要解决，想要分享反馈，或者讨论更多的想法吗？请随时在这里留下评论！请使用尽量使用英文并遵循 Rust 的 <a href="https://www.rust-lang.org/policies/code-of-conduct">code of conduct</a>. 这个讨论串将与 <a href="_discussion_url_"><em>discussion on GitHub</em></a> 直接连接，所以你也可以直接在那边发表评论
+"""
 
-[translations.zh-TW]
+# Chinese (traditional)
+[languages.zh-TW]
+title = "Writing an OS in Rust"
+description = "This blog series creates a small operating system in the Rust programming language. Each post is a small tutorial and includes all needed code."
+[languages.zh-TW.translations]
 lang_name = "Chinese (traditional)"
 toc = "目錄"
 all_posts = "« 所有文章"
@@ -74,9 +97,21 @@ not_translated = "（該文章還沒有被翻譯。）"
 translated_content = "翻譯內容："
 translated_content_notice = "這是對原文章 <strong><a href=\"_original.permalink_\">_original.title_</a></strong> 的社區中文翻譯。它可能不完整，過時或者包含錯誤。可以在 <a href=\"https://github.com/phil-opp/blog_os/issues/961\">這個 Issue</a> 上評論和提問！"
 translated_by = "翻譯者："
+translation_contributors = "With contributions from"
 word_separator = "和"
+support_me = """
+<h2>Support Me</h2>
+<p>Creating and maintaining this blog and the associated libraries is a lot of work, but I really enjoy doing it. By supporting me, you allow me to invest more time in new content, new features, and continuous maintenance. The best way to support me is to <a href="https://github.com/sponsors/phil-opp"><em>sponsor me on GitHub</em></a>. Thank you!</p>
+"""
+comment_note = """
+Do you have a problem, want to share feedback, or discuss further ideas? Feel free to leave a comment here! Please stick to English and follow Rust's <a href="https://www.rust-lang.org/policies/code-of-conduct">code of conduct</a>. This comment thread directly maps to a <a href="_discussion_url_"><em>discussion on GitHub</em></a>, so you can also comment there if you prefer.
+"""
 
-[translations.ja]
+# Japanese
+[languages.ja]
+title = "Writing an OS in Rust"
+description = "This blog series creates a small operating system in the Rust programming language. Each post is a small tutorial and includes all needed code."
+[languages.ja.translations]
 lang_name = "Japanese"
 toc = "目次"
 all_posts = "« すべての記事へ"
@@ -87,9 +122,21 @@ not_translated = "（この記事はまだ翻訳されていません。）"
 translated_content = "この記事は翻訳されたものです："
 translated_content_notice = "この記事は<strong><a href=\"_original.permalink_\">_original.title_</a></strong>をコミュニティの手により翻訳したものです。そのため、翻訳が完全・最新でなかったり、原文にない誤りを含んでいる可能性があります。問題があれば<a href=\"https://github.com/phil-opp/blog_os/issues/906\">このissue</a>上で報告してください！"
 translated_by = "翻訳者："
+translation_contributors = "With contributions from"
 word_separator = "及び"
+support_me = """
+<h2>Support Me</h2>
+<p>Creating and maintaining this blog and the associated libraries is a lot of work, but I really enjoy doing it. By supporting me, you allow me to invest more time in new content, new features, and continuous maintenance. The best way to support me is to <a href="https://github.com/sponsors/phil-opp"><em>sponsor me on GitHub</em></a>. Thank you!</p>
+"""
+comment_note = """
+Do you have a problem, want to share feedback, or discuss further ideas? Feel free to leave a comment here! Please stick to English and follow Rust's <a href="https://www.rust-lang.org/policies/code-of-conduct">code of conduct</a>. This comment thread directly maps to a <a href="_discussion_url_"><em>discussion on GitHub</em></a>, so you can also comment there if you prefer.
+"""
 
-[translations.fa]
+# Persian
+[languages.fa]
+title = "Writing an OS in Rust"
+description = "This blog series creates a small operating system in the Rust programming language. Each post is a small tutorial and includes all needed code."
+[languages.fa.translations]
 lang_name = "Persian"
 toc = "فهرست مطالب"
 all_posts = "« همه پست‌ها"
@@ -100,9 +147,21 @@ not_translated = "(.این پست هنوز ترجمه نشده است)"
 translated_content = "محتوای ترجمه شده:"
 translated_content_notice = "این یک ترجمه از جامعه کاربران برای پست <strong><a href=\"_original.permalink_\">_original.title_</a></strong> است. ممکن است ناقص، منسوخ شده یا دارای خطا باشد. لطفا هر گونه مشکل را در <a href=\"https://github.com/phil-opp/blog_os/issues/908\">این ایشو</a> گزارش دهید!"
 translated_by = "ترجمه توسط"
+translation_contributors = "With contributions from"
 word_separator = "و"
+support_me = """
+<h2>Support Me</h2>
+<p>Creating and maintaining this blog and the associated libraries is a lot of work, but I really enjoy doing it. By supporting me, you allow me to invest more time in new content, new features, and continuous maintenance. The best way to support me is to <a href="https://github.com/sponsors/phil-opp"><em>sponsor me on GitHub</em></a>. Thank you!</p>
+"""
+comment_note = """
+Do you have a problem, want to share feedback, or discuss further ideas? Feel free to leave a comment here! Please stick to English and follow Rust's <a href="https://www.rust-lang.org/policies/code-of-conduct">code of conduct</a>. This comment thread directly maps to a <a href="_discussion_url_"><em>discussion on GitHub</em></a>, so you can also comment there if you prefer.
+"""
 
-[translations.ru]
+# Russian
+[languages.ru]
+title = "Writing an OS in Rust"
+description = "This blog series creates a small operating system in the Rust programming language. Each post is a small tutorial and includes all needed code."
+[languages.ru.translations]
 lang_name = "Russian"
 toc = "Содержание"
 all_posts = "« Все посты"
@@ -113,9 +172,21 @@ not_translated = "(Этот пост еще не переведен.)"
 translated_content = "Переведенное содержание:"
 translated_content_notice = "Это перевод сообщества поста <strong><a href=\"_original.permalink_\">_original.title_</a></strong>. Он может быть неполным, устаревшим или содержать ошибки. Пожалуйста, сообщайте о любых проблемах!"
 translated_by = "Перевод сделан"
+translation_contributors = "With contributions from"
 word_separator = "и"
+support_me = """
+<h2>Support Me</h2>
+<p>Creating and maintaining this blog and the associated libraries is a lot of work, but I really enjoy doing it. By supporting me, you allow me to invest more time in new content, new features, and continuous maintenance. The best way to support me is to <a href="https://github.com/sponsors/phil-opp"><em>sponsor me on GitHub</em></a>. Thank you!</p>
+"""
+comment_note = """
+Do you have a problem, want to share feedback, or discuss further ideas? Feel free to leave a comment here! Please stick to English and follow Rust's <a href="https://www.rust-lang.org/policies/code-of-conduct">code of conduct</a>. This comment thread directly maps to a <a href="_discussion_url_"><em>discussion on GitHub</em></a>, so you can also comment there if you prefer.
+"""
 
-[translations.fr]
+# French
+[languages.fr]
+title = "Writing an OS in Rust"
+description = "This blog series creates a small operating system in the Rust programming language. Each post is a small tutorial and includes all needed code."
+[languages.fr.translations]
 lang_name = "French"
 toc = "Table des matières"
 all_posts = "« Tous les articles"
@@ -126,4 +197,60 @@ not_translated = "(Cet article n'est pas encore traduit.)"
 translated_content = "Contenu traduit : "
 translated_content_notice = "Ceci est une traduction communautaire de l'article <strong><a href=\"_original.permalink_\">_original.title_</a></strong>. Il peut être incomplet, obsolète ou contenir des erreurs. Veuillez signaler les quelconques problèmes !"
 translated_by = "Traduit par : "
+translation_contributors = "With contributions from"
 word_separator = "et"
+support_me = """
+<h2>Support Me</h2>
+<p>Creating and maintaining this blog and the associated libraries is a lot of work, but I really enjoy doing it. By supporting me, you allow me to invest more time in new content, new features, and continuous maintenance. The best way to support me is to <a href="https://github.com/sponsors/phil-opp"><em>sponsor me on GitHub</em></a>. Thank you!</p>
+"""
+comment_note = """
+Do you have a problem, want to share feedback, or discuss further ideas? Feel free to leave a comment here! Please stick to English and follow Rust's <a href="https://www.rust-lang.org/policies/code-of-conduct">code of conduct</a>. This comment thread directly maps to a <a href="_discussion_url_"><em>discussion on GitHub</em></a>, so you can also comment there if you prefer.
+"""
+
+# Korean
+[languages.ko]
+title = "Writing an OS in Rust"
+description = "This blog series creates a small operating system in the Rust programming language. Each post is a small tutorial and includes all needed code."
+[languages.ko.translations]
+lang_name = "Korean"
+toc = "목차"
+all_posts = "« 모든 게시글"
+comments = "댓글"
+comments_notice = "댓글은 가능하면 영어로 작성해주세요."
+readmore = "더&nbsp;읽기&nbsp;»"
+not_translated = "(아직 번역이 완료되지 않은 게시글입니다)"
+translated_content = "번역된 내용 : "
+translated_content_notice = "이것은 커뮤니티 멤버가 <strong><a href=\"_original.permalink_\">_original.title_</a></strong> 포스트를 번역한 글입니다. 부족한 설명이나 오류, 혹은 시간이 지나 더 이상 유효하지 않은 정보를 발견하시면 제보해주세요!"
+translated_by = "번역한 사람 : "
+translation_contributors = "With contributions from"
+word_separator = "와"
+support_me = """
+<h2>Support Me</h2>
+<p>Creating and maintaining this blog and the associated libraries is a lot of work, but I really enjoy doing it. By supporting me, you allow me to invest more time in new content, new features, and continuous maintenance. The best way to support me is to <a href="https://github.com/sponsors/phil-opp"><em>sponsor me on GitHub</em></a>. Thank you!</p>
+"""
+comment_note = """
+Do you have a problem, want to share feedback, or discuss further ideas? Feel free to leave a comment here! Please stick to English and follow Rust's <a href="https://www.rust-lang.org/policies/code-of-conduct">code of conduct</a>. This comment thread directly maps to a <a href="_discussion_url_"><em>discussion on GitHub</em></a>, so you can also comment there if you prefer.
+"""
+
+[languages.ar]
+title = "Writing an OS in Rust"
+[languages.ar.translations]
+lang_name = "Arabic"
+toc = "Table of Contents"
+all_posts = "« All Posts"
+comments = "Comments"
+comments_notice = "Please leave your comments in English if possible."
+readmore = "read&nbsp;more&nbsp;»"
+not_translated = "(This post is not translated yet.)"
+translated_content = "Translated Content:"
+translated_content_notice = "This is a community translation of the <strong><a href=\"_original.permalink_\">_original.title_</a></strong> post. It might be incomplete, outdated or contain errors. Please report any issues!"
+translated_by = "Translation by"
+translation_contributors = "With contributions from"
+word_separator = "and"
+support_me = """
+<h2>Support Me</h2>
+<p>Creating and maintaining this blog and the associated libraries is a lot of work, but I really enjoy doing it. By supporting me, you allow me to invest more time in new content, new features, and continuous maintenance. The best way to support me is to <a href="https://github.com/sponsors/phil-opp"><em>sponsor me on GitHub</em></a>. Thank you!</p>
+"""
+comment_note = """
+Do you have a problem, want to share feedback, or discuss further ideas? Feel free to leave a comment here! Please stick to English and follow Rust's <a href="https://www.rust-lang.org/policies/code-of-conduct">code of conduct</a>. This comment thread directly maps to a <a href="_discussion_url_"><em>discussion on GitHub</em></a>, so you can also comment there if you prefer.
+"""

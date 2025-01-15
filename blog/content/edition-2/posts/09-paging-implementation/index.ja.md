@@ -5,9 +5,8 @@ path = "ja/paging-implementation"
 date = 2019-03-14
 
 [extra]
-chapter = "Memory Management"
 translation_based_on_commit = "27ab4518acbb132e327ed4f4f0508393e9d4d684"
-translators = ["woodyZootopia", "garasubo"]
+translators = ["swnakamura", "garasubo"]
 +++
 
 この記事では私達のカーネルをページングに対応させる方法についてお伝えします。まずページテーブルの物理フレームにカーネルがアクセスできるようにする様々な方法を示し、それらの利点と欠点について議論します。次にアドレス変換関数を、ついで新しい<ruby>対応付け<rp> (</rp><rt>マッピング</rt><rp>) </rp></ruby>を作るための関数を実装します。
@@ -18,6 +17,7 @@ translators = ["woodyZootopia", "garasubo"]
 
 [GitHub]: https://github.com/phil-opp/blog_os
 [at the bottom]: #comments
+<!-- fix for zola anchor checker (target is in template): <a id="comments"> -->
 [post branch]: https://github.com/phil-opp/blog_os/tree/post-09
 
 <!-- toc -->
@@ -71,7 +71,7 @@ translators = ["woodyZootopia", "garasubo"]
 
 この方法では、新しいページテーブルを作るたびに新しいマッピングを作る必要があるという欠点があります。また、他のアドレス空間のページテーブルにアクセスすることができると新しいプロセスを作るときに便利なのですが、これも不可能です。
 
-### 物理メモリ全体をマップする
+### 物理メモリ全体をマップする {#map-the-complete-physical-memory}
 
 これらの問題はページテーブルのフレームだけと言わず**物理メモリ全体をマップして**しまえば解決します：
 
@@ -272,7 +272,7 @@ frame.map(|frame| frame.start_address() + u64::from(addr.page_offset()))
 
 [cargo features]: https://doc.rust-lang.org/cargo/reference/features.html#the-features-section
 
-- `map_physical_memory` featureを使うと、全物理メモリを仮想アドレス空間のどこかにマッピングします。そのため、カーネルはすべての物理メモリにアクセスでき、[上で述べた方法に従って物理メモリ全体をマップする](#wu-li-memoriquan-ti-wodui-ying-fu-keru)ことができます。
+- `map_physical_memory` featureを使うと、全物理メモリを仮想アドレス空間のどこかにマッピングします。そのため、カーネルはすべての物理メモリにアクセスでき、[上で述べた方法に従って物理メモリ全体をマップする](#map-the-complete-physical-memory)ことができます。
 - `recursive_page_table` featureでは、ブートローダはレベル4ページテーブルのエントリを再帰的にマッピングします。これによりカーネルは[再帰的ページテーブル](#zai-gui-de-peziteburu)で述べた方法に従ってページテーブルにアクセスすることができます。
 
 私達のカーネルには、シンプルでプラットフォーム非依存かつ（ページテーブルのフレームでないメモリにもアクセスできるので）より強力である1つ目の方法を採ることにします。必要なブートローダの<ruby>機能<rp> (</rp><rt>feature</rt><rp>) </rp></ruby>を有効化するために、`map_physical_memory` featureを`bootloader`のdependencyに追加します。
@@ -280,7 +280,7 @@ frame.map(|frame| frame.start_address() + u64::from(addr.page_offset()))
 
 ```toml
 [dependencies]
-bootloader = { version = "0.9.8", features = ["map_physical_memory"]}
+bootloader = { version = "0.9", features = ["map_physical_memory"]}
 ```
 
 この機能を有効化すると、ブートローダは物理メモリの全体を、ある未使用の仮想アドレス空間にマッピングします。この仮想アドレスの範囲をカーネルに伝えるために、ブートローダは**boot information**構造体を渡します。
@@ -290,7 +290,7 @@ bootloader = { version = "0.9.8", features = ["map_physical_memory"]}
 
 `bootloader`クレートは、カーネルに渡されるすべての情報を格納する[`BootInfo`]構造体を定義しています。この構造体はまだ開発の初期段階にあり、将来の[対応していないsemverの][semver-incompatible]ブートローダのバージョンに更新した際には、うまく動かなくなることが予想されます。`map_physical_memory` featureが有効化されているので、いまこれは`memory_map`と`physical_memory_offset`という2つのフィールドを持っています：
 
-[`BootInfo`]: https://docs.rs/bootloader/0.9.3/bootloader/bootinfo/struct.BootInfo.html
+[`BootInfo`]: https://docs.rs/bootloader/0.9/bootloader/bootinfo/struct.BootInfo.html
 [semver-incompatible]: https://doc.rust-lang.org/stable/cargo/reference/specifying-dependencies.html#caret-requirements
 
 - `memory_map`フィールドは、利用可能な物理メモリの情報の概要を保持しています。システムの利用可能な物理メモリがどのくらいかや、どのメモリ領域がVGAハードウェアのようなデバイスのために予約されているかをカーネルに伝えます。これらのメモリマッピングはBIOSやUEFIファームウェアから取得できますが、それが可能なのはブートのごく初期に限られます。そのため、これらをカーネルが後で取得することはできないので、ブートローダによって提供する必要があるわけです。このメモリマッピングは後で必要となります。

@@ -5,7 +5,6 @@ path = "fa/vga-text-mode"
 date  = 2018-02-26
 
 [extra]
-chapter = "Bare Bones"
 # Please update this when updating the translation
 translation_based_on_commit = "fb8b03e82d9805473fed16e8795a78a020a6b537"
 # GitHub usernames of the people that translated this post
@@ -24,6 +23,7 @@ rtl = true
 
 [گیت‌هاب]: https://github.com/phil-opp/blog_os
 [در زیر]: #comments
+<!-- fix for zola anchor checker (target is in template): <a id="comments"> -->
 [post branch]: https://github.com/phil-opp/blog_os/tree/post-03
 
 <!-- toc -->
@@ -650,7 +650,7 @@ pub fn _print(args: fmt::Arguments) {
 
 از آنجا که ماکروها باید بتوانند از خارج از ماژول، `_print` را فراخوانی کنند، تابع باید عمومی (public) باشد. با این حال ، از آنجا که این جزئیات پیاده سازی را خصوصی (private) در نظر می گیریم، [ویژگی `doc(hidden)`] را اضافه می کنیم تا از مستندات تولید شده پنهان شود.
 
-[ویژگی `doc(hidden)`]: https://doc.rust-lang.org/nightly/rustdoc/the-doc-attribute.html#dochidden
+[ویژگی `doc(hidden)`]: https://doc.rust-lang.org/nightly/rustdoc/write-documentation/the-doc-attribute.html#hidden
 
 ### Hello World توسط `println`
 اکنون می توانیم از `println` در تابع `_start` استفاده کنیم:

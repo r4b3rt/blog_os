@@ -5,7 +5,6 @@ path = "ru/freestanding-rust-binary"
 date = 2018-02-10
 
 [extra]
-chapter = "С нуля"
 translators = ["MrZloHex"]
 +++
 
@@ -19,6 +18,7 @@ translators = ["MrZloHex"]
 
 [GitHub]: https://github.com/phil-opp/blog_os
 [at the bottom]: #comments
+<!-- fix for zola anchor checker (target is in template): <a id="comments"> -->
 [post branch]: https://github.com/phil-opp/blog_os/tree/post-01
 
 <!-- toc -->
@@ -43,7 +43,7 @@ translators = ["MrZloHex"]
 
 Чтобы создать ядро ОС на Rust, нужно создать исполняемый файл, который мог бы запускаться без ОС.
 
-Этот пост описывает необходимые шаги для создания независимого исполняемого файла на Rust и объясняет, почему эти шаги нужны. Если вам интересен только минимальный пример, можете сразу перейти к __[итогам](#Итоги)__.
+Этот пост описывает необходимые шаги для создания независимого исполняемого файла на Rust и объясняет, почему эти шаги нужны. Если вам интересен только минимальный пример, можете сразу перейти к __[итогам](#summary)__.
 
 ## Отключение стандартной библиотеки
 По умолчанию, все Rust-крейты подключают [стандартную библиотеку][standard library], которая зависит от возможностей операционной системы, таких как потоки, файлы, сети. Она также зависит от стандартной библиотки C `libc`, которая очень тесно взаимодействует с возможностями ОС. Так как мы хотим написать операционную систему, мы не можем использовать библиотеки, которые зависят от операционной системы. Поэтому необходимо отключить автоматические подключение стандартной библиотеки через [атрибут `no_std`][attribute].
@@ -157,7 +157,7 @@ fn panic(_info: &PanicInfo) -> ! {
 [language item]: https://github.com/rust-lang/rust/blob/edb368491551a77d77a48446d4ee88b35490c565/src/libpanic_unwind/gcc.rs#L11-L45
 [stack unwinding]: https://www.bogotobogo.com/cplusplus/stackunwinding.php
 [libunwind]: https://www.nongnu.org/libunwind/
-[structured exception handling]: https://docs.microsoft.com/de-de/windows/win32/debug/structured-exception-handling
+[structured exception handling]: https://docs.microsoft.com/ru-ru/windows/win32/debug/structured-exception-handling
 
 ### Отключение раскрутки
 
@@ -453,7 +453,7 @@ rustflags = ["-C", "link-args=-e __start -static -nostartfiles"]
 
 </details>
 
-## Итоги
+## Итоги {#summary}
 
 Минимальный независимый исполняемый бинарный файл Rust выглядит примерно так:
 

@@ -5,7 +5,6 @@ path = "fa/paging-introduction"
 date = 2019-01-14
 
 [extra]
-chapter = "Memory Management"
 # Please update this when updating the translation
 translation_based_on_commit = "f692c5b377460e872bca2d3fcec787f4a0d1ec9b"
 # GitHub usernames of the people that translated this post
@@ -21,6 +20,7 @@ rtl = true
 
 [گیت‌هاب]: https://github.com/phil-opp/blog_os
 [در زیر]: #comments
+<!-- fix for zola anchor checker (target is in template): <a id="comments"> -->
 [post branch]: https://github.com/phil-opp/blog_os/tree/post-08
 
 <!-- toc -->
@@ -321,7 +321,7 @@ pub extern "C" fn _start() -> ! {
     blog_os::init();
 
     // new
-    let ptr = 0xdeadbeaf as *mut u32;
+    let ptr = 0xdeadbeaf as *mut u8;
     unsafe { *ptr = 42; }
 
     // as before
@@ -346,7 +346,7 @@ pub extern "C" fn _start() -> ! {
 ```rust
 // Note: The actual address might be different for you. Use the address that
 // your page fault handler reports.
-let ptr = 0x2031b2 as *mut u32;
+let ptr = 0x2031b2 as *mut u8;
 
 // read from a code page
 unsafe { let x = *ptr; }

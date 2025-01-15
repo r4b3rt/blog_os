@@ -5,11 +5,10 @@ path = "ja/vga-text-mode"
 date  = 2018-02-26
 
 [extra]
-chapter = "Bare Bones"
 # Please update this when updating the translation
 translation_based_on_commit = "bd6fbcb1c36705b2c474d7fcee387bfea1210851"
 # GitHub usernames of the people that translated this post
-translators = ["woodyZootopia", "JohnTitor"]
+translators = ["swnakamura", "JohnTitor"]
 +++
 
 [VGAテキストモード][VGA text mode]は画面にテキストを出力するシンプルな方法です。この記事では、すべてのunsafeな要素を別のモジュールにカプセル化することで、それを安全かつシンプルに扱えるようにするインターフェースを作ります。また、Rustの[フォーマッティングマクロ][formatting macros]のサポートも実装します。
@@ -23,6 +22,7 @@ translators = ["woodyZootopia", "JohnTitor"]
 
 [GitHub]: https://github.com/phil-opp/blog_os
 [at the bottom]: #comments
+<!-- fix for zola anchor checker (target is in template): <a id="comments"> -->
 [post branch]: https://github.com/phil-opp/blog_os/tree/post-03
 
 <!-- toc -->
@@ -663,7 +663,7 @@ pub fn _print(args: fmt::Arguments) {
 
 マクロは`_print`をモジュールの外側から呼び出せる必要があるので、この関数は<ruby>公開<rp> (</rp><rt>public</rt><rp>) </rp></ruby>されていなければなりません。しかし、これは<ruby>非公開<rp> (</rp><rt>private</rt><rp>) </rp></ruby>の実装の詳細であると考え、[`doc(hidden)`属性][`doc(hidden)` attribute]をつけることで、生成されたドキュメントから隠すようにします。
 
-[`doc(hidden)` attribute]: https://doc.rust-lang.org/nightly/rustdoc/the-doc-attribute.html#dochidden
+[`doc(hidden)` attribute]: https://doc.rust-lang.org/nightly/rustdoc/write-documentation/the-doc-attribute.html#hidden
 
 ### `println`を使ってHello World
 こうすることで、`_start`関数で`println`を使えるようになります：

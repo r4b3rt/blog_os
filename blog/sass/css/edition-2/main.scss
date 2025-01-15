@@ -377,7 +377,6 @@ tbody tr:nth-child(odd) th {
 
 /* Blog post or page title */
 .page-title,
-.post-title,
 .post-title a {
     color: var(--post-title-color);
 }
@@ -588,6 +587,13 @@ main img {
     color: #999999;
 }
 
+.translation_contributors {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: gray;
+}
+
 .post-category {
     margin-right: 0.5rem;
     text-transform: uppercase;
@@ -637,6 +643,10 @@ main img {
 footer.footer {
     margin-top: 1rem;
     margin-bottom: 1rem;
+
+    .spaced {
+        margin-left: 0.5rem;
+    }
 }
 
 .footnotes {
@@ -959,25 +969,6 @@ a strong {
 
 img {
     background-color: white;
-}
-
-/* Note that dark mode is experimental */
-
-.dark-mode-note {
-    display: none;
-}
-[data-theme="dark"] .dark-mode-note {
-    display: block;
-}
-@media (prefers-color-scheme: dark) {
-    /* defaults to dark theme */
-    .dark-mode-note {
-        display: block;
-    }
-    /* Override dark mode with light mode styles if the user decides to swap */
-    [data-theme="light"] .dark-mode-note {
-        display: none;
-    }
 }
 
 /* Manual switch between dark and light mode */

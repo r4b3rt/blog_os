@@ -5,11 +5,10 @@ path = "ja/paging-introduction"
 date = 2019-01-14
 
 [extra]
-chapter = "Memory Management"
 # Please update this when updating the translation
 translation_based_on_commit = "3315bfe2f63571f5e6e924d58ed32afd8f39f892"
 # GitHub usernames of the people that translated this post
-translators = ["woodyZootopia", "JohnTitor"]
+translators = ["swnakamura", "JohnTitor"]
 +++
 
 この記事では**ページング**を紹介します。これは、私達のオペレーティングシステムにも使う、とても一般的なメモリ管理方式です。なぜメモリの分離が必要なのか、**セグメンテーション**がどういう仕組みなのか、**仮想メモリ**とは何なのか、ページングがいかにしてメモリ<ruby>断片化<rp> (</rp><rt>フラグメンテーション</rt><rp>) </rp></ruby>の問題を解決するのかを説明します。また、x86_64アーキテクチャにおける、マルチレベルページテーブルのレイアウトについても説明します。
@@ -20,6 +19,7 @@ translators = ["woodyZootopia", "JohnTitor"]
 
 [GitHub]: https://github.com/phil-opp/blog_os
 [at the bottom]: #comments
+<!-- fix for zola anchor checker (target is in template): <a id="comments"> -->
 [post branch]: https://github.com/phil-opp/blog_os/tree/post-08
 
 <!-- toc -->
@@ -328,7 +328,7 @@ pub extern "C" fn _start() -> ! {
     blog_os::init();
 
     // ここを追加
-    let ptr = 0xdeadbeaf as *mut u32;
+    let ptr = 0xdeadbeaf as *mut u8;
     unsafe { *ptr = 42; }
 
     // ここはこれまでと同じ
@@ -353,7 +353,7 @@ pub extern "C" fn _start() -> ! {
 ```rust
 // 注意：実際のアドレスは個々人で違うかもしれません。
 // あなたのページフォルトハンドラが報告した値を使ってください。
-let ptr = 0x2031b2 as *mut u32;
+let ptr = 0x2031b2 as *mut u8;
 
 // コードページから読み込む
 unsafe { let x = *ptr; }

@@ -31,8 +31,6 @@ nightly
 
 [rustup]: https://www.rustup.rs/
 
-The code from this post (and all following) is [automatically tested](https://travis-ci.org/phil-opp/blog_os) every day and should always work for the newest nightly. If it doesn't, please [file an issue](https://github.com/phil-opp/blog_os/issues).
-
 ## Creating a Cargo project
 [Cargo] is Rust's excellent package manager. Normally you would call `cargo new` when you want to create a new project folder. We can't use it because our folder already exists, so we need to do it manually. Fortunately we only need to add a cargo configuration file named `Cargo.toml`:
 
@@ -100,7 +98,7 @@ Rust allows us to define [custom targets] through a JSON configuration file. A m
 ```json
 {
   "llvm-target": "x86_64-unknown-linux-gnu",
-  "data-layout": "e-m:e-i64:64-f80:128-n8:16:32:64-S128",
+  "data-layout": "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128",
   "linker-flavor": "gcc",
   "target-endian": "little",
   "target-pointer-width": "64",
@@ -135,7 +133,7 @@ For our target system, we define the following JSON configuration in a file name
 ```json
 {
   "llvm-target": "x86_64-unknown-none",
-  "data-layout": "e-m:e-i64:64-f80:128-n8:16:32:64-S128",
+  "data-layout": "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128",
   "linker-flavor": "gcc",
   "target-endian": "little",
   "target-pointer-width": "64",
@@ -406,9 +404,7 @@ So the linker can't find a function named `_Unwind_Resume` that is referenced e.
 
 [iterator.rs:389]: https://github.com/rust-lang/rust/blob/c58c928e658d2e45f816fd05796a964aa83759da/src/libcore/iter/iterator.rs#L389
 
-By default, the destructors of all stack variables are run when a `panic` occurs. This is called _unwinding_ and allows parent threads to [recover from panics]. However, it requires a platform specific gcc library, which isn't available in our kernel.
-
-[recover from panics]: https://www.howtobuildsoftware.com/index.php/how-do/fFH/rust-recovering-from-panic-in-another-thread
+By default, the destructors of all stack variables are run when a `panic` occurs. This is called _unwinding_ and allows parent threads to recover from panics. However, it requires a platform specific gcc library, which isn't available in our kernel.
 
 Fortunately, Rust allows us to disable unwinding for our target. For that we add the following line to our `x86_64-blog_os.json` file:
 
